@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Octokit;
 
 namespace sentiment
 {
@@ -68,6 +69,7 @@ namespace sentiment
             var client          = new HttpClient(handler);
 
             var subscriptionKey = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_API_KEY", EnvironmentVariableTarget.Process);
+            if (string.IsNullOrEmpty(subscriptionKey)) throw new ArgumentNullException("subscriptionKey", "Please set environment variable TEXT_ANALYTICS_API_KEY");
       
             // Request headers
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
@@ -96,9 +98,19 @@ namespace sentiment
             }
         }
 
-        static async Task UpdateComment(long repositoryId, int commentId, string existingCommentBody, string sentimentMessage)
+        private async Task UpdateComment(long repositoryId, int commentId, string existingCommentBody, string sentimentMessage)
         {
-            //  Update github comment
+            var ghe = Environment.GetEnvironmentVariable("GITHUB_ENTERPRISE_URL", EnvironmentVariableTarget.Process);
+            if (string.IsNullOrEmpty(ghe)) throw new ArgumentNullException("ghe", "Please set environment variable GITHUB_ENTERPRISE_URL");
+
+            var client = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("sentiment-test-bot", "0.1.0"), ghe);
+
+            var personalAccessToken = Environment.GetEnvironmentVariable("GITHUB_PERSONAL_ACCESS_TOKEN", EnvironmentVariableTarget.Process);
+            if (string.IsNullOrEmpty(personalAccessToken)) throw new ArgumentNullException("personalAccessToken", "Please set environment variable GITHUB_PERSONAL_ACCESS_TOKEN");
+            
+            client.Credentials = new Credentials(personalAccessToken);
+
+            await client.Issue.Comment.Update(repositoryId, commentId, $"{existingCommentBody}\n\n_Sentiment Bot Says: {sentimentMessage}_");
         }
     }
 }
