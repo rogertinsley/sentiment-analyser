@@ -41,15 +41,27 @@ namespace sentiment
             int commentId     = data.comment.id;
 
             var sentimentScore = await AnalyzeSentiment(comment);
-            var sentimentPercentage = Convert.ToDouble(sentimentScore);
+            string sentiment = "neutral";
+            string sentimentMessage = $"How very netural. (Score: {sentimentScore})";
 
-            var sentimentComment = $"[Generated Comment] That comment received a sentiment score of {Math.Round(sentimentPercentage, 2)}%.";
+            if (sentimentScore <= 0.2)
+            {
+                sentiment = "negative";
+                sentimentMessage = $"Hey now, let's keep it positive. (Score: {sentimentScore})";
+            }
+            else if (sentimentScore >= 0.8)
+            {
+                sentiment = "positive";
+                sentimentMessage = $"Thanks for keeping it so positive! (Score: {sentimentScore})";
+            }
 
-            return Ok(sentimentComment);
+            await UpdateComment(repositoryId, commentId, comment, sentimentMessage);
+
+            return Ok($"Sentiment: '{sentiment}'. Comment: '{comment}' on '{issueTitle}'");
         }
 
-       private async Task<string> AnalyzeSentiment(string comment)
-        {
+       private async Task<double> AnalyzeSentiment(string comment)
+       {
             var handler         = new HttpClientHandler();
             handler.UseProxy    = true;
             handler.Proxy       = new WebProxy();
@@ -79,8 +91,14 @@ namespace sentiment
                 _logger.LogInformation($"Comment: {comment}");
                 _logger.LogInformation($"Sentiment: {data["documents"][0]["score"].ToString()}");
 
-                return data["documents"][0]["score"].ToString();
+                var sentimentScore = data["documents"][0]["score"].ToString();
+                return Math.Round(Convert.ToDouble(sentimentScore), 2);
             }
+        }
+
+        static async Task UpdateComment(long repositoryId, int commentId, string existingCommentBody, string sentimentMessage)
+        {
+            //  Update github comment
         }
     }
 }
