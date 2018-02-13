@@ -58,7 +58,7 @@ namespace sentiment
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
 
             // Request body
-            byte[] byteData = Encoding.UTF8.GetBytes("{\"documents\": [{\"language\": \"en\",\"id\": \"1234\",\"text\": \" " + comment + " \"}]}");
+            byte[] byteData = Encoding.UTF8.GetBytes("{\"documents\": [{\"language\": \"en\",\"id\": \"1\",\"text\": \" " + comment + " \"}]}");
 
             using (var content = new ByteArrayContent(byteData))
             {
