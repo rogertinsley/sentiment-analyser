@@ -41,8 +41,11 @@ namespace sentiment
             int commentId     = data.comment.id;
 
             var sentimentScore = await AnalyzeSentiment(comment);
+            var sentimentPercentage = Convert.ToDouble(sentimentScore);
 
-            return Ok(sentimentScore);
+            var sentimentComment = $"[Generated Comment] That comment received a sentiment score of {Math.Round(sentimentPercentage, 2)}%.";
+
+            return Ok(sentimentComment);
         }
 
        private async Task<string> AnalyzeSentiment(string comment)

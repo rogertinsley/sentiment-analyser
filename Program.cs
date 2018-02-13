@@ -19,7 +19,7 @@ namespace sentiment
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseUrls("http://localhost:5000", "http://LT10364:5000", "http://192.168.41.145:5000")
+                .UseUrls("http://localhost:5000", "http://LT10364:5000", "http://192.168.41.182:5000")
                 .UseStartup<Startup>()
                 .Build();
     }
