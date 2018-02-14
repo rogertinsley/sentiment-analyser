@@ -103,7 +103,7 @@ namespace sentiment
             var ghe = Environment.GetEnvironmentVariable("GITHUB_ENTERPRISE_URL", EnvironmentVariableTarget.Process);
             if (string.IsNullOrEmpty(ghe)) throw new ArgumentNullException("ghe", "Please set environment variable GITHUB_ENTERPRISE_URL");
 
-            var client = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("sentiment-test-bot", "0.1.0"), ghe);
+            var client = new Octokit.GitHubClient(new Octokit.ProductHeaderValue("sentiment-test-bot", "0.1.0"), new Uri(ghe));
 
             var personalAccessToken = Environment.GetEnvironmentVariable("GITHUB_PERSONAL_ACCESS_TOKEN", EnvironmentVariableTarget.Process);
             if (string.IsNullOrEmpty(personalAccessToken)) throw new ArgumentNullException("personalAccessToken", "Please set environment variable GITHUB_PERSONAL_ACCESS_TOKEN");
